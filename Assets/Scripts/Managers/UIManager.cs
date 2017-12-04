@@ -12,7 +12,7 @@ public class UIManager : MonoBehaviour {
     public Toggle redHouse, redTree, blueHouse, blueTree;
     public Text upText, redText, blueText,logText;
 
-    public Text TestMoneyText;
+    public Text testMoneyText;
 
     public GameManager gameManager;
 
@@ -104,12 +104,10 @@ public class UIManager : MonoBehaviour {
             + "\n総維持費 =￥" + player.houseNum * gameManager.houseMaintenanceCost + "\n総収入 =￥" + player.treeNum * gameManager.treeIncome;
     }
 
-    //Test
     public int GetInitialMoney()
     {
-        string tex = TestMoneyText.text;
         int value;
-        if(int.TryParse(tex,out value))
+        if (int.TryParse(testMoneyText.text, out value))
         {
             return value;
         }
@@ -118,4 +116,5 @@ public class UIManager : MonoBehaviour {
             return -1;
         }
     }
+    
 }

@@ -75,7 +75,7 @@ public class GameManager : MonoBehaviour {
             else 
             {
                 wasPass = false;
-
+                
                 int cost = uiManager.selectedItem[whichPlayer] == 0 ? houseBuiltCost : treeBuiltCost;
 				if (players [whichPlayer].money < cost) {
 					LessMoneyLog ();
@@ -95,6 +95,9 @@ public class GameManager : MonoBehaviour {
 				{
 					bool wasDestroy = DestroyHouse (whichPlayer, coodination);
 					MyDestroyLog (wasDestroy);
+                    boardManager.DisplayCanPutField(whichPlayer);
+                    PlayerNumUpdate(-1);
+                    uiManager.UIUpdate();
 					return;
 				}
             }
