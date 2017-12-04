@@ -69,7 +69,7 @@ public class ObjectManager : MonoBehaviour {
         {
             tree = blueTree;
         }
-        Instantiate(tree, new Vector3(offset + unit * i, 0f, offset + unit * j), Quaternion.identity);
+		objects [i, j] = Instantiate (tree, new Vector3 (offset + unit * i, 0f, offset + unit * j), Quaternion.identity);
     }
 
     public void Reset()

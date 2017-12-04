@@ -263,7 +263,7 @@ public class BoardManager : MonoBehaviour {
         {
             for(int y = j-1; y <= j+1; y++)
             {
-                if(CheckObjects(x,y) == myTree)
+				if(CheckObjects(x,y) == myTree && CheckStatus(x,y) == States.none)
                 {
                     return false;
                 }
@@ -278,11 +278,9 @@ public class BoardManager : MonoBehaviour {
                 {
                     ChangeStatus(x, y, myState);
                 }
-                if(CheckObjects(x,y) == oppositeTree)
+				if(CheckObjects(x,y) == oppositeTree && CheckStatus(x,y) == myState)
                 {
-                    objectManager.ChangeTree(x, y, myTree);
-                    players[whichPlayer].treeNum++;
-                    players[(whichPlayer + 1) % 2].treeNum--;
+					ChangeTree (x, y, whichPlayer, myTree);
                 }
             }
         }
@@ -290,6 +288,13 @@ public class BoardManager : MonoBehaviour {
 
         return true;
     }
+
+	private void ChangeTree(int i, int j, int whichPlayer, Objects tree){
+		players [whichPlayer].treeNum++;
+		players[(whichPlayer + 1) % 2].treeNum--;
+		objectManager.ChangeTree (i, j, tree);
+		objectStates [i, j] = tree;
+	}
 
     private bool PutTreeCheck(int i, int j, int whichPlayer)
     {

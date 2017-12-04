@@ -77,22 +77,26 @@ public class GameManager : MonoBehaviour {
                 wasPass = false;
 
                 int cost = uiManager.selectedItem[whichPlayer] == 0 ? houseBuiltCost : treeBuiltCost;
-                if(players[whichPlayer].money < cost)
-                {
-                    LessMoneyLog();
-                    return;
-                }
-                else if (Build(whichPlayer, coodination))
-                {
-                    players[whichPlayer].money -= cost;
-                    PlayerNumUpdate(1);
-                    BuildLog();
-                }
-                else
-                {
-                    CannotPutLog();
-                    return;
-                }
+				if (players [whichPlayer].money < cost) {
+					LessMoneyLog ();
+					return;
+				} 
+				else if (uiManager.selectedItem [whichPlayer] != UIManager.Item.RemoveHouse) {
+					if (Build (whichPlayer, coodination)) {
+						players [whichPlayer].money -= cost;
+						PlayerNumUpdate (1);
+						BuildLog ();
+					} else {
+						CannotPutLog ();
+						return;
+					}
+				} 
+				else //RemoveHouse
+				{
+					bool wasDestroy = DestroyHouse (whichPlayer, coodination);
+					MyDestroyLog (wasDestroy);
+					return;
+				}
             }
         }
         else
@@ -233,8 +237,8 @@ public class GameManager : MonoBehaviour {
     {
         houseBuiltCost = Random.Range(8, 13) * 10;
         houseMaintenanceCost = Random.Range(3, 7) * 10;
-        treeBuiltCost = Random.Range(5, 10) * 10;
-        treeIncome = Random.Range(3, 11) * 10;
+		treeBuiltCost = Random.Range(3, 7) * 10;
+		treeIncome = Random.Range(4, 11) * 10;
     }
 
     private void TreeIncome(int playerIndex)
@@ -246,7 +250,7 @@ public class GameManager : MonoBehaviour {
     private bool Maintenance(int playerIndex)
     {
         Player p = players[playerIndex];
-        if(p.money > p.houseNum * houseMaintenanceCost)
+		if(p.money >= p.houseNum * houseMaintenanceCost)
         {
             p.money -= p.houseNum * houseMaintenanceCost;
             return true;
@@ -403,4 +407,14 @@ public class GameManager : MonoBehaviour {
 
         uiManager.AddLog(playerName + "が再起不能になったため" + playerName + "の負けです");
     }
+
+	private void MyDestroyLog(bool wasDestroy){
+		string playerName = whichPlayer == 0 ? "赤" : "青";
+
+		if (wasDestroy) {
+			uiManager.AddLog (playerName + "が自分の家を手放しました");
+		} else {
+			uiManager.AddLog (playerName + "の家しか手放せません");
+		}
+	}
 }

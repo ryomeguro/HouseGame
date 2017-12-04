@@ -5,7 +5,7 @@ using UnityEngine.UI;
 
 public class UIManager : MonoBehaviour {
 
-    public enum Item : int {House, Tree};
+	public enum Item : int {House, Tree, RemoveHouse};
 
     public Item [] selectedItem = new Item[2];
 
@@ -20,9 +20,22 @@ public class UIManager : MonoBehaviour {
 
     public void IsToggleClicked(bool state)
     {
-        selectedItem[0] = redHouse.isOn ? Item.House : Item.Tree;
-        selectedItem[1] = blueHouse.isOn ? Item.House : Item.Tree;
+		//selectedItem[0] = redHouse.isOn ? Item.House : Item.Tree;
+		//selectedItem[1] = blueHouse.isOn ? Item.House : Item.Tree;
         //Debug.Log(selectedItem[0]+":"+selectedItem[1]);
+		if (redHouse.isOn)
+			selectedItem [0] = Item.House;
+		else if (redTree.isOn)
+			selectedItem [0] = Item.Tree;
+		else
+			selectedItem [0] = Item.RemoveHouse;
+
+		if (blueHouse.isOn)
+			selectedItem [1] = Item.House;
+		else if (blueTree.isOn)
+			selectedItem [1] = Item.Tree;
+		else
+			selectedItem [1] = Item.RemoveHouse;
 
     }
 
