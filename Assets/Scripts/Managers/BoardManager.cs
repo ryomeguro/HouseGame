@@ -162,16 +162,46 @@ public class BoardManager : MonoBehaviour {
 
     }
 
-    public bool DestroyHouse(int i, int j, int whichPlayer)
+	public bool RemoveObject(int whichPlayer, Vector2Int coodination){
+		Objects myHouse, myTree;
+		if (whichPlayer == 0) {
+			myHouse = Objects.redHouse;
+			myTree = Objects.redTree;
+		} else {
+			myHouse = Objects.blueHouse;
+			myTree = Objects.blueTree;
+		}
+
+		Objects currentobj = CheckObjects (coodination.x, coodination.y);
+		if (currentobj == myHouse) {
+			DestroyHouse (coodination.x, coodination.y, whichPlayer);
+			return true;
+		} else if (currentobj == myTree) {
+			DestroyTree (coodination.x, coodination.y, whichPlayer);
+			return true;
+		} else {
+			return false;
+		}
+	}
+
+	public void DestroyTree(int i, int j, int whichPlayer){
+		objectManager.DestroyObject (i, j);
+		players [whichPlayer].treeNum--;
+		objectStates [i, j] = Objects.none;
+	}
+
+	public bool DestroyHouse(int i, int j, int whichPlayer)
     {
-        Objects obj = whichPlayer == 0 ? Objects.redHouse : Objects.blueHouse;
-        if(objectStates[i,j] != obj)
+		Objects obj = whichPlayer == 0 ? Objects.redHouse : Objects.blueHouse;
+		if(objectStates[i,j] != obj)
         {
             return false;
         }
 
-        objectManager.DestroyHouse(i, j);
+		objectManager.DestroyObject(i, j);
         objectStates[i, j] = Objects.none;
+
+		players [whichPlayer].houseNum--;
 
         States mystate = whichPlayer == 0 ? States.red : States.blue;
         for(int x = i-1; x <= i+1; x++)
@@ -198,7 +228,7 @@ public class BoardManager : MonoBehaviour {
             }
         }
 
-        return true;
+		return true;
     }
 
     private void CheckAndChangeHouse(int x, int y, States mystate)

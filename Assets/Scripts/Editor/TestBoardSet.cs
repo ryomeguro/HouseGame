@@ -10,7 +10,7 @@ public class TestBoardSet : MonoBehaviour
 
     static float y = 0.01f;
 
-    static Transform[] childlenlines = new Transform[1000];
+	static Transform[] childlenlines = new Transform[1500];
 
     [MenuItem("Test/BoardSet")]
     public static void BoardSet()

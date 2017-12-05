@@ -5,7 +5,7 @@ using UnityEngine.EventSystems;
 
 public class GameManager : MonoBehaviour {
 
-    public const int num = 13;
+	public const int num = 13;
     public const float maxVec = 5f;
 
     int whichPlayer = 0;
@@ -93,10 +93,10 @@ public class GameManager : MonoBehaviour {
 				} 
 				else //RemoveHouse
 				{
-					bool wasDestroy = DestroyHouse (whichPlayer, coodination);
+					bool wasDestroy = RemoveObject (whichPlayer, coodination);
 					MyDestroyLog (wasDestroy);
                     boardManager.DisplayCanPutField(whichPlayer);
-                    PlayerNumUpdate(-1);
+					//PlayerNumUpdate(-1);
                     uiManager.UIUpdate();
 					return;
 				}
@@ -107,7 +107,7 @@ public class GameManager : MonoBehaviour {
             if (DestroyHouse(whichPlayer, coodination))
             {
                 destroyNum--;
-                PlayerNumUpdate(-1);
+				//PlayerNumUpdate(-1);
                 DestroyLog();
             }
             if (destroyNum > 0)
@@ -284,6 +284,10 @@ public class GameManager : MonoBehaviour {
         return boardManager.DestroyHouse(coodination.x, coodination.y, playerIndex);
     }
 
+	private bool RemoveObject(int playerIndex, Vector2Int coodination){
+		return boardManager.RemoveObject (playerIndex, coodination);
+	}
+
     private void PlayerNumUpdate(int plusminus)
     {
         if (plusminus > 0)
@@ -417,7 +421,7 @@ public class GameManager : MonoBehaviour {
 		if (wasDestroy) {
 			uiManager.AddLog (playerName + "が自分の家を手放しました");
 		} else {
-			uiManager.AddLog (playerName + "の家しか手放せません");
+			uiManager.AddLog (playerName + "の家か木しか手放せません");
 		}
 	}
 }

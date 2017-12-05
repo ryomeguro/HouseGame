@@ -51,7 +51,7 @@ public class ObjectManager : MonoBehaviour {
         objects[i, j] = Instantiate(g, new Vector3(offset + unit * i, 0f, offset + unit * j), Quaternion.identity);
     }
 
-    public void DestroyHouse(int i, int j)
+	public void DestroyObject(int i, int j)
     {
         Destroy(objects[i, j]);
         objects[i, j] = null;
