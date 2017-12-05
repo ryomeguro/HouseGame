@@ -37,6 +37,8 @@ public class UIManager : MonoBehaviour {
 		else
 			selectedItem [1] = Item.RemoveHouse;
 
+		Debug.Log (selectedItem[0]+":"+selectedItem[1]);
+
     }
 
     public void UIUpdate()
@@ -80,8 +82,8 @@ public class UIManager : MonoBehaviour {
 
     private void UpTextUpdate()
     {
-        upText.text = "家建設費=￥" + gameManager.houseBuiltCost + ",家維持費=￥" + gameManager.houseMaintenanceCost
-            + "木設置費=￥" + gameManager.treeBuiltCost + ",木収入=￥" + gameManager.treeIncome;
+        upText.text = "家建設費=＄" + gameManager.houseBuiltCost + ",家維持費=＄" + gameManager.houseMaintenanceCost
+            + "木設置費=＄" + gameManager.treeBuiltCost + ",木収入=＄" + gameManager.treeIncome;
 
     }
 
@@ -100,8 +102,8 @@ public class UIManager : MonoBehaviour {
 
         Text text = index == 0 ? redText : blueText;
 
-        text.text = "所持金 =￥" + player.money + "\n家の数 = " + player.houseNum + "\n木の数 = " + player.treeNum
-            + "\n総維持費 =￥" + player.houseNum * gameManager.houseMaintenanceCost + "\n総収入 =￥" + player.treeNum * gameManager.treeIncome;
+        text.text = "所持金 =＄" + player.money + "\n家の数 = " + player.houseNum + "\n木の数 = " + player.treeNum
+            + "\n総維持費 =＄" + player.houseNum * gameManager.houseMaintenanceCost + "\n総収入 =＄" + player.treeNum * gameManager.treeIncome;
     }
 
     public int GetInitialMoney()

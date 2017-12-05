@@ -4,7 +4,7 @@ using UnityEngine;
 
 public class BoardManager : MonoBehaviour {
 
-    enum States : int{none, red, blue, outer};
+	enum States : int{none, red, blue, outer};
     public enum Objects : int{none, redHouse, blueHouse, redTree, blueTree, redBase, blueBase};
 
     public ObjectManager objectManager;
@@ -85,6 +85,8 @@ public class BoardManager : MonoBehaviour {
 
         PutObject(num - 1, num - 1, Objects.blueBase);
         PutObject(0, 0, Objects.redBase);
+		objectStates[num - 1, num - 1] = Objects.blueBase;
+		objectStates[0, 0] = Objects.redBase;
     }
 
     void ChangeStatus(int i, int j, States state)
@@ -208,12 +210,15 @@ public class BoardManager : MonoBehaviour {
         {
             for(int y = j-1; y <= j+1; y++)
             {
-                if(CheckStatus(x,y) == mystate && !IsBaseField(x,y,whichPlayer))
+				if(CheckStatus(x,y) == mystate && !IsBaseField(x,y,whichPlayer) && CheckObjects(x,y) != obj)
                 {
                     ChangeStatus(x, y, States.none);
                 }
             }
         }
+
+		//canputfieldの再計算
+		CanPutFieldUpdate (whichPlayer);
 
         for(int x = i - 2; x <= i + 2; x++)
         {
@@ -237,7 +242,7 @@ public class BoardManager : MonoBehaviour {
         {
             for (int ny = y - 1; ny <= y + 1; ny++)
             {
-                if (CheckStatus(nx, ny) == States.none)
+				if (CheckStatus(nx, ny) == States.none && canPutField[nx,ny])
                 {
                     ChangeStatus(nx, ny, mystate);
                 }
@@ -284,10 +289,10 @@ public class BoardManager : MonoBehaviour {
             return false;
         }
 
-        if(CheckStatus(i,j) == oppositeState)
+		/*if(CheckStatus(i,j) == oppositeState)
         {
             return false;
-        }
+        }*/
 
         for(int x = i-1; x <= i+1; x++)
         {
@@ -392,6 +397,14 @@ public class BoardManager : MonoBehaviour {
                 }
             }
         }
+
+		for (int i = 0; i < num; i++) {
+			for (int j = 0; j < num; j++) {
+				if (canPutField [i, j]) {
+					Display (i, j);
+				}
+			}
+		}
     }
 
     public void ClearDisplay()
@@ -406,6 +419,31 @@ public class BoardManager : MonoBehaviour {
         }
     }
 
+	private void CanPutFieldUpdate(int whichPlayer){
+		for(int i = 0; i < num; i++)
+		{
+			for (int j = 0; j < num; j++)
+			{
+				canPutField[i, j] = false;
+				searchField[i, j] = false;
+			}
+		}
+
+
+		tmpMyState = whichPlayer == 0 ? States.red : States.blue;
+		tmpwhichPlayer = whichPlayer;
+		for(int i = 0; i < num; i++)
+		{
+			for(int j = 0; j < num; j++)
+			{
+				if(CheckStatus(i,j) == tmpMyState && !searchField[i, j])
+				{
+					Search(i, j);
+				}
+			}
+		}
+	}
+
 
     private void Search(int i, int j)
     {
@@ -414,7 +452,7 @@ public class BoardManager : MonoBehaviour {
         States currentState = CheckStatus(i, j);
         if(currentState == States.none)
         {
-            Display(i, j);
+			//Display(i, j);
             canPutField[i, j] = true;
         }else if(currentState == tmpMyState)
         {

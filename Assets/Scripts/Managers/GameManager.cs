@@ -55,6 +55,7 @@ public class GameManager : MonoBehaviour {
     {
         if (!canClick)
         {
+			Debug.Log ("Can't Click");
             return;
         }
 
@@ -76,11 +77,13 @@ public class GameManager : MonoBehaviour {
             {
                 wasPass = false;
                 
-                int cost = uiManager.selectedItem[whichPlayer] == 0 ? houseBuiltCost : treeBuiltCost;
-				if (players [whichPlayer].money < cost) {
+				int cost = uiManager.selectedItem [whichPlayer] == UIManager.Item.House ? houseBuiltCost : treeBuiltCost;
+
+				if (players [whichPlayer].money < cost && uiManager.selectedItem[whichPlayer] != UIManager.Item.RemoveHouse) {
 					LessMoneyLog ();
 					return;
 				} 
+
 				else if (uiManager.selectedItem [whichPlayer] != UIManager.Item.RemoveHouse) {
 					if (Build (whichPlayer, coodination)) {
 						players [whichPlayer].money -= cost;
@@ -93,7 +96,7 @@ public class GameManager : MonoBehaviour {
 				} 
 				else //RemoveHouse
 				{
-					bool wasDestroy = RemoveObject (whichPlayer, coodination);
+					bool wasDestroy = boardManager.RemoveObject (whichPlayer, coodination);
 					MyDestroyLog (wasDestroy);
                     boardManager.DisplayCanPutField(whichPlayer);
 					//PlayerNumUpdate(-1);
@@ -104,7 +107,7 @@ public class GameManager : MonoBehaviour {
         }
         else
         {
-            if (DestroyHouse(whichPlayer, coodination))
+			if (boardManager.DestroyHouse(coodination.x, coodination.y, whichPlayer))
             {
                 destroyNum--;
 				//PlayerNumUpdate(-1);
@@ -239,9 +242,13 @@ public class GameManager : MonoBehaviour {
     private void PropertyDecision()
     {
         houseBuiltCost = Random.Range(8, 13) * 10;
-        houseMaintenanceCost = Random.Range(3, 7) * 10;
+		houseMaintenanceCost = Random.Range(4, 7) * 10;
 		treeBuiltCost = Random.Range(3, 7) * 10;
 		treeIncome = Random.Range(4, 11) * 10;
+
+		if (houseMaintenanceCost == treeIncome) {
+			treeIncome += 10;
+		}
     }
 
     private void TreeIncome(int playerIndex)
@@ -279,15 +286,6 @@ public class GameManager : MonoBehaviour {
         return boardManager.PutObject(coordination.x, coordination.y, obj);
     }
 
-    private bool DestroyHouse(int playerIndex, Vector2Int coodination)
-    {
-        return boardManager.DestroyHouse(coodination.x, coodination.y, playerIndex);
-    }
-
-	private bool RemoveObject(int playerIndex, Vector2Int coodination){
-		return boardManager.RemoveObject (playerIndex, coodination);
-	}
-
     private void PlayerNumUpdate(int plusminus)
     {
         if (plusminus > 0)
@@ -308,6 +306,10 @@ public class GameManager : MonoBehaviour {
 
     }
 
+	/*
+	 * ここからLOGメソッド
+	 */
+
     private void BuildLog()
     {
         string playerName = whichPlayer == 0 ? "赤" : "青";
@@ -324,7 +326,7 @@ public class GameManager : MonoBehaviour {
 
         if (income != 0)
         {
-            uiManager.AddLog(playerName + "が金のなる木から￥" + income + "ゲット");
+            uiManager.AddLog(playerName + "が金のなる木から＄" + income + "ゲット");
         }
     }
 
@@ -336,7 +338,7 @@ public class GameManager : MonoBehaviour {
 
         if(maintenance != 0)
         {
-            uiManager.AddLog(playerName + "は家の維持費￥" + maintenance + "を支払った");
+            uiManager.AddLog(playerName + "は家の維持費＄" + maintenance + "を支払った");
         }
     }
 
