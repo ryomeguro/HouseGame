@@ -38,6 +38,7 @@ public class GameManager : MonoBehaviour {
 
     public void OnBoardClicked(BaseEventData e)
     {
+		Debug.Log ("BoardClicked");
         PointerEventData pData = e as PointerEventData;
         Vector3 clickedPosition = pData.pointerCurrentRaycast.worldPosition;
         Vector2Int coordination = CalcCoordination(clickedPosition);
@@ -248,7 +249,11 @@ public class GameManager : MonoBehaviour {
 
 		if (houseMaintenanceCost == treeIncome) {
 			treeIncome += 10;
+		} else if (houseMaintenanceCost > treeIncome) {
+			houseMaintenanceCost = treeIncome + 10;
+			treeBuiltCost = Random.Range (1, (treeIncome - 20) / 10) * 10;
 		}
+
     }
 
     private void TreeIncome(int playerIndex)

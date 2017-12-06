@@ -483,7 +483,9 @@ public class BoardManager : MonoBehaviour {
 
     private void Display(int i, int j)
     {
-        displayQuads[tmpwhichPlayer, i, j].SetActive(true);
+		if(CheckStatus(i,j) != tmpMyState){
+			displayQuads[tmpwhichPlayer, i, j].SetActive(true);
+		}
     }
 
     private bool CheckSearchField(int i, int j)

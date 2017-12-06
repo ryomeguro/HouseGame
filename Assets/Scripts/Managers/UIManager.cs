@@ -37,7 +37,7 @@ public class UIManager : MonoBehaviour {
 		else
 			selectedItem [1] = Item.RemoveHouse;
 
-		Debug.Log (selectedItem[0]+":"+selectedItem[1]);
+		//Debug.Log (selectedItem[0]+":"+selectedItem[1]);
 
     }
 
