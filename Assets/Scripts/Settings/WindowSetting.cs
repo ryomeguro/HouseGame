@@ -7,7 +7,7 @@ public class WindowSetting /*: MonoBehaviour*/ {
     [RuntimeInitializeOnLoadMethod]
     static void OnRuntimeMethodLoad()
     {
-        Screen.SetResolution(1024, 576, false, 60);
+		Screen.SetResolution(1024, 576, false, 60);
 
     }
 }

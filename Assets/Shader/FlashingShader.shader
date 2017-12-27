@@ -1,4 +1,4 @@
-﻿Shader "Custom/sample" {
+﻿Shader "Custom/FlashShader" {
 	Properties {
 		_Color ("Color", Color) = (1,1,1,1)
 	}
@@ -27,7 +27,7 @@
 			//	//o.Albedo = _Color;
 			//}
 
-			float val = ((sin(_Time*70) + 1) / 2) * 0.2 + 0.3;
+			float val = (abs(sin(_Time*40)) * 2) * 0.2 + 0.3;
 			o.Albedo = lerp(_Color, fixed4(1,1,1,1), val);
 			o.Alpha = _Color[3];
 		}

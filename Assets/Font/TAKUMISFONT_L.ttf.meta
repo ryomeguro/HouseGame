@@ -1,0 +1,23 @@
+fileFormatVersion: 2
+guid: 3e16fc80e7f2d4e8393cb7a19a7b3423
+timeCreated: 1514002350
+licenseType: Free
+TrueTypeFontImporter:
+  externalObjects: {}
+  serializedVersion: 4
+  fontSize: 16
+  forceTextureCase: -2
+  characterSpacing: 0
+  characterPadding: 1
+  includeFontData: 1
+  fontName: takumi-syokeifont-L
+  fontNames:
+  - takumi-syokeifont-L
+  fallbackFontReferences: []
+  customCharacters: 
+  fontRenderingMode: 0
+  ascentCalculationMode: 1
+  useLegacyBoundsCalculation: 0
+  userData: 
+  assetBundleName: 
+  assetBundleVariant: 

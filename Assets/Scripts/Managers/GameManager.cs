@@ -10,7 +10,7 @@ public class GameManager : MonoBehaviour {
 
     int whichPlayer = 0;
     bool canMaintain = true;
-    bool wasPass = false;
+	//bool wasPass = false;
 
     bool canClick = true;
 
@@ -18,6 +18,7 @@ public class GameManager : MonoBehaviour {
     public UIManager uiManager;
 
     public Player[] players = new Player[2];
+	public bool[] isFinish = new bool[2];
     public int turn = 0;
     public int destroyNum = 0;
 
@@ -28,17 +29,20 @@ public class GameManager : MonoBehaviour {
 
 	// Use this for initialization
 	void Start () {
-        whichPlayer = 0;
+		/*whichPlayer = 0;
         boardManager.BoardInit(num, maxVec, players);
         PropertyDecision();
         boardManager.DisplayCanPutField(whichPlayer);
 
-        uiManager.UIUpdate();
+        uiManager.UIUpdate();*/
+
+		boardManager.BoardInit(num, maxVec, players);
+		Reset ();
 	}
 
     public void OnBoardClicked(BaseEventData e)
     {
-		Debug.Log ("BoardClicked");
+		//Debug.Log ("BoardClicked");
         PointerEventData pData = e as PointerEventData;
         Vector3 clickedPosition = pData.pointerCurrentRaycast.worldPosition;
         Vector2Int coordination = CalcCoordination(clickedPosition);
@@ -47,10 +51,19 @@ public class GameManager : MonoBehaviour {
         Turn(false, coordination);
     }
 
-    public void OnPassClicked()
+	public void OnPassClicked(int whichPlayer)
     {
-        Turn(true, Vector2Int.zero);
+		if (this.whichPlayer == whichPlayer) {
+			Turn (true, Vector2Int.zero);
+		}
     }
+
+	public void OnEndClicked(int whichPlayer){
+		if (this.whichPlayer == whichPlayer) {
+			isFinish [whichPlayer] = true;
+			Turn (true, Vector2Int.zero);
+		}
+	}
 
     public void Turn(bool isPass,Vector2Int coodination)
     {
@@ -64,28 +77,33 @@ public class GameManager : MonoBehaviour {
         {
             if (isPass)
             {
-                if (wasPass)
+				/*if (wasPass)
                 {
                     PassEndLog();
                     canClick = false;
                     boardManager.ClearDisplay();
                     return;
                 }
-                wasPass = true;
-                PassLog();
+                wasPass = true;*/
+				if (!isFinish [whichPlayer]) {
+					PassLog ();
+				} else {
+					EndLog ();
+					uiManager.EndPanelEnable (whichPlayer);
+				}
             }
             else 
             {
-                wasPass = false;
+				//wasPass = false;
                 
 				int cost = uiManager.selectedItem [whichPlayer] == UIManager.Item.House ? houseBuiltCost : treeBuiltCost;
 
-				if (players [whichPlayer].money < cost && uiManager.selectedItem[whichPlayer] != UIManager.Item.RemoveHouse) {
+				if (players [whichPlayer].money < cost && uiManager.selectedItem[whichPlayer] != UIManager.Item.Remove) {
 					LessMoneyLog ();
 					return;
 				} 
 
-				else if (uiManager.selectedItem [whichPlayer] != UIManager.Item.RemoveHouse) {
+				else if (uiManager.selectedItem [whichPlayer] != UIManager.Item.Remove) {
 					if (Build (whichPlayer, coodination)) {
 						players [whichPlayer].money -= cost;
 						PlayerNumUpdate (1);
@@ -95,7 +113,7 @@ public class GameManager : MonoBehaviour {
 						return;
 					}
 				} 
-				else //RemoveHouse
+				else //Remove
 				{
 					bool wasDestroy = boardManager.RemoveObject (whichPlayer, coodination);
 					MyDestroyLog (wasDestroy);
@@ -131,8 +149,27 @@ public class GameManager : MonoBehaviour {
 
         whichPlayer = (whichPlayer + 1) % 2;
 
+		if (isFinish [0] && isFinish [1]) {
+			//PassEndLog();
+			uiManager.WinEnd (boardManager.CountField());
+
+			canClick = false;
+			boardManager.ClearDisplay();
+			return;
+		}
+		if (isFinish [whichPlayer]) {
+			WasEndLog ();
+			whichPlayer = (whichPlayer + 1) % 2;
+		}
+
         TreeIncome(whichPlayer);
         IncomeLog();
+
+		if (!CheckCanRestart (whichPlayer)) {
+			uiManager.LoseEnd (whichPlayer);
+			return;
+		}
+
         if (!Maintenance(whichPlayer))
         {
             canMaintain = false;
@@ -157,7 +194,9 @@ public class GameManager : MonoBehaviour {
         {
             canClick = false;
             boardManager.ClearDisplay();
-            NoMoneyEndLog();
+
+			//NoMoneyEndLog();
+			uiManager.LoseEnd (whichPlayer);
         }
 
 
@@ -204,27 +243,42 @@ public class GameManager : MonoBehaviour {
         PropertyDecision();
         boardManager.BoardReset();
         boardManager.DisplayCanPutField(whichPlayer);
-        wasPass = false;
+		//wasPass = false;
         canClick = true;
+
+		isFinish [0] = false;
+		isFinish [1] = false;
 
         for(int i = 0; i < 2; i++)
         {
+			isFinish [i] = false;
+
             players[i].Reset();
 
             /*
              *  This is Test Code !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
              */
 
-            int m;
+			/*int m;
             if((m = uiManager.GetInitialMoney()) > 0)
             {
                 players[i].money = m;
-            }
+			}*/
         }
 
-        uiManager.UIUpdate();
-        uiManager.ClearLog();
+		uiManager.EndPanelDisenable ();
+		Debug.Log ("Reset");
+		uiManager.mpManager.SetProperty (houseBuiltCost, houseMaintenanceCost, treeBuiltCost, treeIncome);
+		uiManager.mpManager.StartCoroutine("SlotStart");
+
+		//uiManager.UIUpdate();
+		//uiManager.ClearLog();
     }
+
+	/*public void Reset2(){
+		uiManager.UIUpdate();
+		uiManager.ClearLog();
+	}*/
 
     private bool CheckCanRestart(int whichPlayer)
     {
@@ -245,7 +299,7 @@ public class GameManager : MonoBehaviour {
         houseBuiltCost = Random.Range(8, 13) * 10;
 		houseMaintenanceCost = Random.Range(4, 7) * 10;
 		treeBuiltCost = Random.Range(3, 7) * 10;
-		treeIncome = Random.Range(4, 11) * 10;
+		treeIncome = Random.Range(3, 10) * 10;
 
 		if (houseMaintenanceCost == treeIncome) {
 			treeIncome += 10;
@@ -397,7 +451,7 @@ public class GameManager : MonoBehaviour {
         uiManager.AddLog(playerName + "はパスした");
     }
 
-    private void PassEndLog()
+	/*private void PassEndLog()
     {
         int[] count = boardManager.CountField();
 
@@ -413,7 +467,7 @@ public class GameManager : MonoBehaviour {
         }
 
         uiManager.AddLog(log);
-    }
+	}*/
 
     private void NoMoneyEndLog()
     {
@@ -430,5 +484,17 @@ public class GameManager : MonoBehaviour {
 		} else {
 			uiManager.AddLog (playerName + "の家か木しか手放せません");
 		}
+	}
+
+	private void EndLog(){
+		string playerName = whichPlayer == 0 ? "赤" : "青";
+
+		uiManager.AddLog (playerName + "は終了しました");
+	}
+
+	private void WasEndLog(){
+		string playerName = whichPlayer == 0 ? "赤" : "青";
+
+		uiManager.AddLog (playerName + "は終了しています");
 	}
 }

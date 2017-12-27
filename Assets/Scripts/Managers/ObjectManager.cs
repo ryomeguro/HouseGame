@@ -12,6 +12,7 @@ public class ObjectManager : MonoBehaviour {
     float offset;
 
     public GameObject redHouse, blueHouse, redTree, blueTree, redBase, blueBase;
+	public GameObject smokeAndStar,smoke;
 
     public void Init(int num,float maxVec)
     {
@@ -27,34 +28,52 @@ public class ObjectManager : MonoBehaviour {
     public void PutObject(int i,int j,BoardManager.Objects obj)
     {
         GameObject g = null;
-        switch (obj)
-        {
-            case BoardManager.Objects.redHouse:
-                g = redHouse;
-                break;
-            case BoardManager.Objects.blueHouse:
-                g = blueHouse;
-                break;
-            case BoardManager.Objects.redTree:
-                g = redTree;
-                break;
-            case BoardManager.Objects.blueTree:
-                g = blueTree;
-                break;
-            case BoardManager.Objects.redBase:
-                g = redBase;
-                break;
-            case BoardManager.Objects.blueBase:
-                g = blueBase;
-                break;
-        }
-        objects[i, j] = Instantiate(g, new Vector3(offset + unit * i, 0f, offset + unit * j), Quaternion.identity);
+		Quaternion q = Quaternion.identity;
+		bool particleFlg = true;
+
+		switch (obj) {
+		case BoardManager.Objects.redHouse:
+			g = redHouse;
+			break;
+		case BoardManager.Objects.blueHouse:
+			g = blueHouse;
+			break;
+		case BoardManager.Objects.redTree:
+			g = redTree;
+			q = Quaternion.Euler (0, Random.Range (0, 360), 0);
+			break;
+		case BoardManager.Objects.blueTree:
+			g = blueTree;
+			q = Quaternion.Euler (0, Random.Range (0, 360), 0);
+			break;
+		case BoardManager.Objects.redBase:
+			g = redBase;
+			particleFlg = false;
+			break;
+		case BoardManager.Objects.blueBase:
+			g = blueBase;
+			particleFlg = false;
+			break;
+		}
+
+		Vector3 newPos = new Vector3 (offset + unit * i, 0f, offset + unit * j);
+		objects[i, j] = Instantiate(g, newPos, q);
+
+		if (particleFlg) {
+			smokeAndStar.SetActive (false);
+			smokeAndStar.transform.position = newPos;
+			smokeAndStar.SetActive (true);
+		}
     }
 
 	public void DestroyObject(int i, int j)
     {
         Destroy(objects[i, j]);
         objects[i, j] = null;
+
+		smoke.SetActive (false);
+		smoke.transform.position = new Vector3 (offset + unit * i, 0f, offset + unit * j);
+		smoke.SetActive (true);
     }
 
     public void ChangeTree(int i, int j, BoardManager.Objects obj)

@@ -2,10 +2,11 @@
 using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.UI;
+using UnityEngine.SceneManagement;
 
 public class UIManager : MonoBehaviour {
 
-	public enum Item : int {House, Tree, RemoveHouse};
+	public enum Item : int {House, Tree, Remove};
 
     public Item [] selectedItem = new Item[2];
 
@@ -14,7 +15,14 @@ public class UIManager : MonoBehaviour {
 
     public Text testMoneyText;
 
+	public GameObject winPanel;
+
+	public Animator redEndPanel, blueEndPanel;
+
     public GameManager gameManager;
+	public MoneyPanelManager mpManager;
+
+	public Color [] winPanelColor;
 
     private string[] logs = {"","",""};
 
@@ -28,14 +36,14 @@ public class UIManager : MonoBehaviour {
 		else if (redTree.isOn)
 			selectedItem [0] = Item.Tree;
 		else
-			selectedItem [0] = Item.RemoveHouse;
+			selectedItem [0] = Item.Remove;
 
 		if (blueHouse.isOn)
 			selectedItem [1] = Item.House;
 		else if (blueTree.isOn)
 			selectedItem [1] = Item.Tree;
 		else
-			selectedItem [1] = Item.RemoveHouse;
+			selectedItem [1] = Item.Remove;
 
 		//Debug.Log (selectedItem[0]+":"+selectedItem[1]);
 
@@ -77,13 +85,16 @@ public class UIManager : MonoBehaviour {
 
     public void ClearLog()
     {
+		for (int i = 0; i < logs.Length; i++) {
+			logs [i] = "";
+		}
         logText.text = "";
     }
 
     private void UpTextUpdate()
     {
-        upText.text = "家建設費=＄" + gameManager.houseBuiltCost + ",家維持費=＄" + gameManager.houseMaintenanceCost
-            + "木設置費=＄" + gameManager.treeBuiltCost + ",木収入=＄" + gameManager.treeIncome;
+		upText.text = "家の建設費:$" + gameManager.houseBuiltCost + ",家の維持費:$" + gameManager.houseMaintenanceCost
+		              + "木の設置費:$" + gameManager.treeBuiltCost + ",木の収入:$" + gameManager.treeIncome;
 
     }
 
@@ -106,7 +117,7 @@ public class UIManager : MonoBehaviour {
             + "\n総維持費 =＄" + player.houseNum * gameManager.houseMaintenanceCost + "\n総収入 =＄" + player.treeNum * gameManager.treeIncome;
     }
 
-    public int GetInitialMoney()
+	/*public int GetInitialMoney()
     {
         int value;
         if (int.TryParse(testMoneyText.text, out value))
@@ -117,6 +128,71 @@ public class UIManager : MonoBehaviour {
         {
             return -1;
         }
-    }
+    }*/
     
+	public void EnablePanel(Animator panel){
+		panel.SetTrigger ("Big");
+	}
+
+	public void DisablePanel(Animator panel){
+		panel.SetTrigger ("Small");
+	}
+    
+	public void BackToMenu(){
+		SceneManager.LoadSceneAsync ("Menu");
+	}
+
+	public void WinEnd(int [] panelNum){
+		Image winImage = winPanel.GetComponent<Image> ();
+		Text winText = winPanel.transform.Find ("text").GetComponent<Text> ();
+		winText.text = "赤:" + panelNum [0] + ",青:" + panelNum [1] + "\n";
+		if (panelNum [0] == panelNum [1]) {
+			winImage.color = winPanelColor [2];
+			winText.text += "引き分け!";
+		} else {
+			string playerName;
+			if (panelNum [0] > panelNum [1]) {
+				playerName = "赤";
+				winImage.color = winPanelColor [0];
+			} else {
+				playerName = "青";
+				winImage.color = winPanelColor [1];
+			}
+			winText.text += playerName + "の勝ち!!";
+		}
+
+		EnablePanel (winPanel.GetComponent<Animator> ());
+	}
+
+	public void LoseEnd(int whichPlayerLose){
+		Image winImage = winPanel.GetComponent<Image> ();
+		Text winText = winPanel.transform.Find ("text").GetComponent<Text> ();
+		string winName, loseName;
+
+		if (whichPlayerLose == 1) {
+			winName = "赤";
+			loseName = "青";
+			winImage.color = winPanelColor [0];
+		} else {
+			winName = "青";
+			loseName = "赤";
+			winImage.color = winPanelColor [1];
+		}
+
+		winText.text = loseName + "はお金も木もなくなりました\n" + winName + "の勝ち!!";
+		EnablePanel (winPanel.GetComponent<Animator> ());
+	}
+
+	public void EndPanelEnable(int whichPlayer){
+		if (whichPlayer == 0) {
+			EnablePanel (redEndPanel);
+		} else {
+			EnablePanel (blueEndPanel);
+		}
+	}
+
+	public void EndPanelDisenable(){
+		DisablePanel (redEndPanel);
+		DisablePanel (blueEndPanel);
+	}
 }
