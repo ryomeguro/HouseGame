@@ -16,6 +16,7 @@ public class GameManager : MonoBehaviour {
 
     public BoardManager boardManager;
     public UIManager uiManager;
+	public SoundManager soundManager;
 
     public Player[] players = new Player[2];
 	public bool[] isFinish = new bool[2];
@@ -105,10 +106,12 @@ public class GameManager : MonoBehaviour {
 
 				else if (uiManager.selectedItem [whichPlayer] != UIManager.Item.Remove) {
 					if (Build (whichPlayer, coodination)) {
+						soundManager.spawnSound ();
 						players [whichPlayer].money -= cost;
 						PlayerNumUpdate (1);
 						BuildLog ();
 					} else {
+						soundManager.errorSound ();
 						CannotPutLog ();
 						return;
 					}
@@ -116,6 +119,11 @@ public class GameManager : MonoBehaviour {
 				else //Remove
 				{
 					bool wasDestroy = boardManager.RemoveObject (whichPlayer, coodination);
+					if (wasDestroy) {
+						soundManager.deleteSound ();
+					} else {
+						soundManager.errorSound ();
+					}
 					MyDestroyLog (wasDestroy);
                     boardManager.DisplayCanPutField(whichPlayer);
 					//PlayerNumUpdate(-1);
@@ -126,12 +134,14 @@ public class GameManager : MonoBehaviour {
         }
         else
         {
-			if (boardManager.DestroyHouse(coodination.x, coodination.y, whichPlayer))
-            {
-                destroyNum--;
+			if (boardManager.DestroyHouse (coodination.x, coodination.y, whichPlayer)) {
+				soundManager.deleteSound ();
+				destroyNum--;
 				//PlayerNumUpdate(-1);
-                DestroyLog();
-            }
+				DestroyLog ();
+			} else {
+				soundManager.errorSound ();
+			}
             if (destroyNum > 0)
             {
                 uiManager.UIUpdate();
@@ -255,15 +265,6 @@ public class GameManager : MonoBehaviour {
 
             players[i].Reset();
 
-            /*
-             *  This is Test Code !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
-             */
-
-			/*int m;
-            if((m = uiManager.GetInitialMoney()) > 0)
-            {
-                players[i].money = m;
-			}*/
         }
 
 		uiManager.EndPanelDisenable ();
